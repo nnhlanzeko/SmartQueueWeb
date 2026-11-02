@@ -1,0 +1,204 @@
+﻿@model List<SmartQueueWeb.Models.Ticket>
+@{
+    string lang = ViewBag.Lang ?? "en";
+    var offices = ViewBag.Offices as List<SmartQueueWeb.Models.Office>;
+    string myTicketNo = TempData["MyTicket"] as string ?? "";
+    var myTicket = Model.FirstOrDefault(x => x.TicketNumber == myTicketNo) ?? Model.LastOrDefault();
+}
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI',sans-serif;
+        background: #f5f7fb;
+        padding: 15px
+    }
+
+    .hero {
+        background: linear-gradient(90deg, rgba(26,115,232,0.92) 0%, rgba(13,71,161,0.78) 45%, rgba(0,0,0,0.35) 100%), url('/image/queue-bg.jpg');
+        background-size: cover;
+        background-position: center 30%;
+        color: white;
+        padding: 30px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 140px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2)
+    }
+
+    .card-box {
+        background: white;
+        padding: 18px;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+        margin-bottom: 16px
+    }
+
+    .btn-primary {
+        background: #1a73e8;
+        border: none;
+        padding: 11px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer
+    }
+
+    .btn-serve {
+        background: #2e7d32;
+        border: none;
+        padding: 9px 16px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        cursor: pointer
+    }
+
+    .btn-cancel {
+        background: #c62828;
+        border: none;
+        padding: 7px 13px;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer
+    }
+
+    select, input {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        width: 100%;
+        margin-bottom: 9px;
+        box-sizing: border-box
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse
+    }
+
+    th {
+        background: #f1f5f9;
+        padding: 8px;
+        text-align: left
+    }
+
+    td {
+        padding: 8px;
+        border-bottom: 1px solid #eee
+    }
+
+    .badge {
+        background: #e3f2fd;
+        color: #1a73e8;
+        padding: 4px 9px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 13px
+    }
+
+    .waiting {
+        background: #fff8e1;
+        color: #f57f17;
+        padding: 4px 9px;
+        border-radius: 20px;
+        font-size: 13px
+    }
+
+    .myTicketCard {
+        background: linear-gradient(135deg,#e8f5e9,#c8e6c9);
+        border: 2px solid #4caf50
+    }
+
+    .office-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 8px;
+        background: #fafafa
+    }
+
+    @@keyframes pulseAnim {
+        0% {
+            transform: scale(1)
+        }
+
+        50% {
+            transform: scale(1.05)
+        }
+
+        100% {
+            transform: scale(1)
+        }
+    }
+
+    .ubuntuBtn {
+        animation: pulseAnim 2s infinite
+    }
+
+    .compare-box {
+        display: flex;
+        gap: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15)
+    }
+
+        .compare-box div {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            color: white
+        }
+</style>
+
+<div class="hero">
+    <div><h1 style="margin:0;font-size:26px">SmartQueue - South Africa 🇿🇦</h1><small style="font-size:15px">From Long Queue to Short Queue - Book from phone. Ubuntu.</small></div>
+    <form method="get" style="margin:0"><select name="lang" onchange="this.form.submit()" style="width:auto;margin:0;padding:6px"><option value="en">English</option><option value="zu">isiZulu</option></select></form>
+</div>
+
+<div class="compare-box">
+    <div style="background:linear-gradient(135deg,#c62828,#b71c1c)"><h3 style="margin:0">😫 BEFORE</h3><p style="margin:4px 0 0 0;font-size:13px;line-height:1.3">Long queue 4 hours<br />Standing in hot sun<br />No updates</p></div>
+    <div style="background:linear-gradient(135deg,#2e7d32,#1b5e20)"><h3 style="margin:0">🤩 AFTER SmartQueue</h3><p style="margin:4px 0 0 0;font-size:13px;line-height:1.3">Short queue 3 min<br />Wait from home<br />QR + SMS alerts</p></div>
+</div>
+
+@if (TempData["Ubuntu"] != null)
+{
+    <div style="background:#fff3e0;border:2px solid #ff9800;padding:12px;border-radius:10px;color:#e65100;font-weight:bold;text-align:center;margin-bottom:12px">@TempData["Ubuntu"]</div>
+}
+
+@if (myTicket != null)
+{
+    var qrUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=SmartQueue-{myTicket.TicketNumber}";
+    var whatsappUrl = $"https://wa.me/?text={Uri.EscapeDataString($"SmartQueue SA - Ticket {myTicket.TicketNumber} at {myTicket.Branch} - Wait {myTicket.EstimatedMinutes}min")}";
+    <div class="card-box myTicketCard" style="text-align:center">
+        <h3 style="margin-top:0">🎫 @myTicket.TicketNumber</h3><img src="@qrUrl" style="border:6px solid white;border-radius:10px" />
+        <p><b>@myTicket.ServiceType</b> | @myTicket.Branch<br />Ahead: @myTicket.PeopleAhead | Wait: @myTicket.EstimatedMinutes min</p>
+        <a href="@whatsappUrl" target="_blank" style="display:inline-block;background:#25D366;color:white;padding:8px 16px;border-radius:20px;text-decoration:none;font-weight:bold">📱 Share WhatsApp</a>
+        <div style="margin-top:10px">
+            <form action="/Queue/Cancel" method="post" style="display:inline"><input type="hidden" name="ticketNo" value="@myTicket.TicketNumber" /><button class="btn-cancel">Cancel</button></form>
+            <form action="/Queue/DonateSpot" method="post" style="display:inline;margin-left:6px"><input type="hidden" name="ticketNo" value="@myTicket.TicketNumber" /><button class="ubuntuBtn" style="background:#ff6f00;border:none;padding:7px 14px;border-radius:8px;color:white;font-weight:bold;cursor:pointer">❤️ Donate To Gogo</button></form>
+        </div>
+    </div>
+}
+
+<div class="card-box">
+    <h3 style="margin-top:0">Book Your Spot</h3>
+    <form action="/Queue/Join" method="post"><select name="service" required><option value="">-- Choose Service --</option><option>Home Affairs - ID Collection</option><option>Home Affairs - Passport</option><option>SASSA Grant</option><option>Bank - Capitec / FNB</option><option>Clinic - General</option></select><select name="branch"><option>Pietermaritzburg</option><option>Durban Central</option><option>Scottsville</option></select><input name="phone" placeholder="Phone for SMS alerts" /><button type="submit" class="btn-primary">Join Queue</button></form>
+</div>
+
+<div class="card-box">
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Live Queue (@Model.Count)</h3><div><a href="/Queue/Dashboard" style="margin-right:10px">Admin</a><form action="/Queue/ServeNext" method="post" style="display:inline"><button class="btn-serve">Serve Next</button></form></div></div>
+    <table><tr><th>Ticket</th><th>Service</th><th>Branch</th><th>Ahead</th><th>Wait</th><th>Status</th></tr>@foreach(var t in Model){
+        <tr><td><span class="badge">@t.TicketNumber</span></td><td>@t.ServiceType</td><td>@t.Branch</td><td>@t.PeopleAhead</td><td>@t.EstimatedMinutes min</td><td><span class="waiting">@t.Status</span></td></tr>
+    }
+</table>
+</div>
+
+<div class="card-box"><h3 style="margin-top:0">📍 Office Locator</h3>@foreach(var o in offices){
+    <div class="office-card"><b>@o.Name</b><br /><small>@o.Address | @o.Hours</small><br /><a href="@o.MapUrl" target="_blank">Open in Maps</a></div>
+}
+</div>

@@ -1,0 +1,13 @@
+﻿@model List<SmartQueueWeb.Models.Ticket>
+<div style="padding:20px;font-family:Segoe UI">
+    <h1>Admin Dashboard</h1>
+    <p>Total Waiting: <b>@ViewBag.Total</b> | Avg Wait: <b>@ViewBag.AvgWait min</b></p>
+    <table style="width:100%;border-collapse:collapse">
+        <tr><th>Ticket</th><th>Service</th><th>Phone</th><th>Time</th></tr>
+        @foreach (var t in Model)
+        {
+            <tr><td>@t.TicketNumber</td><td>@t.ServiceType</td><td>@t.Phone</td><td>@t.JoinTime.ToShortTimeString()</td></tr>
+        }
+    </table>
+    <a href="/Queue">Back to Queue</a>
+</div>
